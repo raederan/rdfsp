@@ -1,4 +1,4 @@
-# RDFSProcessor
+# rdfs-processor
 A Java app and API to process the RDF Schema from RDF data files.
 
 Usage:
