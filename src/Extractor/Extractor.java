@@ -32,21 +32,12 @@ public class Extractor {
     }
 
     public Schema run(String inputFileName) {
-        return this.run(inputFileName, "./output");
-    }
-    
-    public Schema run(String inputFileName, String outputDirectory) {
         Schema schema = new Schema();
         MultiMap mm_res_rcs = new MultiMap();
         try {
-            File directory = new File(outputDirectory);
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
-
             // Exec phase 1
             InputStream in1 = FileManager.get().open(inputFileName);
-            Reader1 reader1 = new Reader1(schema, mm_res_rcs, outputDirectory);
+            Reader1 reader1 = new Reader1(schema, mm_res_rcs);
             RDFDataMgr.parse(reader1, in1, Lang.TTL);
             if (in1 == null) {
                 throw new IllegalArgumentException("Error (Extractor): File " + inputFileName + " not found");
@@ -54,8 +45,7 @@ public class Extractor {
             in1.close();
 
             // Exec phase 2
-            String instance_file = outputDirectory + "/instance.nt";
-            InputStream in2 = FileManager.get().open(instance_file);
+            InputStream in2 = FileManager.get().open("temp.nt");
             Reader2 reader2 = new Reader2(schema, mm_res_rcs);
             RDFDataMgr.parse(reader2, in2, Lang.NT);
             if (in2 == null) {

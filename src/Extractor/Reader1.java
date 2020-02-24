@@ -35,41 +35,45 @@ import org.apache.jena.vocabulary.RDFS;
 
 public class Reader1 implements StreamRDF {
 
-    private int cnt = 0;
-    private Writer writer;
+    private Writer writer1;
+    private Writer writer2;
+    
     private Schema schema;
     //multimap to store pairs <resource,{Class1,...,ClassN}>
     private MultiMap mm_res_rcs;
-    private String output_dir = ".";
 
-    public Reader1(Schema _schema, MultiMap mm, String outputDirectory) {
+    public Reader1(Schema _schema, MultiMap mm) {
         schema = _schema;
         mm_res_rcs = mm;
-        this.output_dir = outputDirectory;
     }
 
     @Override
     public void start() {
-        String instance_file = output_dir + "/instance.nt";
-        File file = new File(instance_file);
-        if(file.exists()){
-            file.delete();
+        File file1 = new File("temp.nt");
+        if(file1.exists()){
+            file1.delete();
         }
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(instance_file), "UTF-8"));
+            writer1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("temp.nt"), "UTF-8"));
         } catch (Exception ex) {
-            System.out.println("Error (Reader1): Failed to create the file " + instance_file);
+            System.out.println("Error (Reader1): Failed to create the file temp.nt ");
+
+        }
+        
+        File file2 = new File("instance.nt");
+        if(file2.exists()){
+            file2.delete();
+        }
+        try {
+            writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("instance.nt"), "UTF-8"));
+        } catch (Exception ex) {
+            System.out.println("Error (Reader1): Failed to create the file instance.nt ");
 
         }
     }
 
     @Override
     public void triple(Triple triple) {
-        cnt++;
-        if (cnt % 1000 == 0) {
-            System.out.print(".");
-        }
-
         Node s = triple.getSubject();
         Node p = triple.getPredicate();
         Node o = triple.getObject();
@@ -86,18 +90,18 @@ public class Reader1 implements StreamRDF {
                 // (uri,rdf:type,uri)
                 ResourceClass rc = schema.addResourceClass(o.getURI(), o.getNameSpace(), o.getLocalName());
                 mm_res_rcs.put(s.getURI(), rc);
-                this.writeTriple(this.getNodeLabel(s), this.getNodeLabel(p), this.getNodeLabel(o));
+                this.writeTriple(s,p,o);
             }else if(s.isBlank() && o.isURI()){
                 // (bnode,rdf:type,uri)
                 ResourceClass rc = schema.addResourceClass(o.getURI(), o.getNameSpace(), o.getLocalName());
-                String uri = "http://bnode/" + s.getBlankNodeLabel();
+                String uri = "http://bnode/" + s.hashCode();
                 mm_res_rcs.put(uri, rc);
                 if (o.hasURI(RDFS.Datatype.getURI())) {
                     rc.setAsDatatype();
                 }
             } else {
                 System.out.println("Warning: Bad formed RDF triple.");
-                System.out.println(this.getNodeString(s) + " " + this.getNodeString(p) + " " + this.getNodeString(o));
+                System.out.println(this.getNodeLabel1(s) + " " + this.getNodeLabel1(p) + " " + this.getNodeLabel1(o));
             }
             return;
         }
@@ -110,7 +114,7 @@ public class Reader1 implements StreamRDF {
                 schema.addDomainDefinition(rc, pc);
             } else {
                 System.out.println("Error: Bad formed RDF triple");
-                System.out.println(getNodeString(s) + " rdfs:domain " + getNodeString(o));
+                System.out.println(getNodeLabel1(s) + " rdfs:domain " + getNodeLabel1(o));
             }
             return;
         }
@@ -126,7 +130,7 @@ public class Reader1 implements StreamRDF {
                 }
             } else {
                 System.out.println("Error: Bad formed RDF triple");
-                System.out.println(getNodeString(s) + " rdfs:range " + getNodeString(o));
+                System.out.println(getNodeLabel1(s) + " rdfs:range " + getNodeLabel1(o));
             }
             return;
         }
@@ -167,38 +171,48 @@ public class Reader1 implements StreamRDF {
         }
         
         // If triple is simple data, then write to instance file
-        this.writeTriple(this.getNodeLabel(s), this.getNodeLabel(p), this.getNodeLabel(o));
+        this.writeTriple(s,p,o);
         
     }
     
-    private void writeTriple(String subject, String predicate, String object){
-        String line = subject + " " + predicate + " " + object + " .\n";
+    private void writeTriple(Node s, Node p, Node o){
+        String line;
+        
+        line = getNodeLabel2(s) + " " + getNodeLabel2(p) + " " + getNodeLabel2(o) + " .\n";
         try {
-            writer.write(line);
+            writer1.write(line);
         } catch (IOException ex) {
             System.out.println("Error (Reader1): Failed writing line in file temp.nt");
         }
+        
+        line = getNodeLabel1(s) + " " + getNodeLabel1(p) + " " + getNodeLabel1(o) + " .\n";
+        try {
+            writer2.write(line);
+        } catch (IOException ex) {
+            System.out.println("Error (Reader1): Failed writing line in file instance.nt");
+        }
+        
     }
 
-    private String getNodeString(Node node) {
-        if (node.isURI()) {
-            return node.getURI();
-        }
-        if (node.isBlank()) {
-            return node.getBlankNodeLabel();
-        }
-        if (node.isLiteral()) {
-            return node.getLiteral().toString();
-        }
-        return "";
-    }
-
-    private String getNodeLabel(Node node) {
+    private String getNodeLabel1(Node node) {
         if (node.isURI()) {
             return "<" + node.getURI() + ">";
         }
         if (node.isBlank()) {
-            return "<http://bnode/" + node.getBlankNodeLabel() + ">";
+            return "_:b" + node.hashCode();
+        }
+        if (node.isLiteral()) {
+            return "\"" + node.getLiteralValue() + "\"^^<" + node.getLiteralDatatypeURI() + ">";
+        }
+        return "";
+    }
+
+    private String getNodeLabel2(Node node) {
+        if (node.isURI()) {
+            return "<" + node.getURI() + ">";
+        }
+        if (node.isBlank()) {
+            return "<http://bnode/" + node.hashCode() + ">";
         }
         if (node.isLiteral()) {
             return "\"" + node.getLiteralValue() + "\"^^<" + node.getLiteralDatatypeURI() + ">";
@@ -237,10 +251,15 @@ public class Reader1 implements StreamRDF {
     @Override
     public void finish() {
         try {
-            writer.close();
+            writer1.close();
         } catch (IOException ex) {
-            System.out.println("Error (Reader1): Failed closing the files temp.nt");
+            System.out.println("Error (Reader1): Failed closing the file temp.nt");
         }
+        try {
+            writer2.close();
+        } catch (IOException ex) {
+            System.out.println("Error (Reader1): Failed closing the file instance.nt");
+        }        
     }
 
 }

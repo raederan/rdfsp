@@ -23,30 +23,18 @@ public class RDFSProcessor {
         System.out.println("rdfs-processor");
         if (args.length == 1) {
             String inputFileName = String.valueOf(args[0]);
-            String outputDirectory = "./output";
-            String outputFileName = outputDirectory + "/schema.ttl";
             System.out.println("Input file name: " + inputFileName);
-            System.out.println("Output directory: " + outputDirectory);
             System.out.println("Begin");
             Extractor extractor = new Extractor();
-            Schema schema = extractor.run(inputFileName,outputDirectory);
-            schema.write(outputFileName);
+            Schema schema = extractor.run(inputFileName);
+            schema.write("schema.ttl");
             System.out.println("End");
-        } else if (args.length == 2) {
-            String inputFileName = String.valueOf(args[0]);
-            String outputDirectory = String.valueOf(args[1]);
-            String outputFileName = outputDirectory + "/schema.ttl";
-            System.out.println("Input file name: " + inputFileName);
-            System.out.println("Output directory: " + outputDirectory);
-            System.out.println("Begin");
-            Extractor extractor = new Extractor();
-            Schema schema = extractor.run(inputFileName,outputDirectory);
-            schema.write(outputFileName);
-            System.out.println("End");
+            System.out.println("Output: instance.nt, schema.ttl");
         } else {
             System.out.println("Usage:");
-            System.out.println("java -jar RDFSExtractor <input_RDF_file> <output_directory>");
-            System.out.println("The default output_directory is './output'.");
+            System.out.println("java -jar rdfs-processor <RDF_filename>");
+            System.out.println("<RDF_filename> : RDF file to transform");
+            System.out.println("Output: instance.nt, schema.ttl");
         }
     }    
     

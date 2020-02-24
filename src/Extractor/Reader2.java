@@ -19,6 +19,7 @@ import RDFSchema.PropertyClass;
 import RDFSchema.ResourceClass;
 import RDFSchema.Schema;
 import java.io.File;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.apache.jena.graph.Node;
@@ -30,8 +31,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 public class Reader2 implements StreamRDF {
-
-    int cnt = 0;
 
     Schema schema;
     //multimap to store pairs <resource,{Class1,...,ClassN}>
@@ -48,10 +47,6 @@ public class Reader2 implements StreamRDF {
 
     @Override
     public void triple(Triple triple) {
-        cnt++;
-        if (cnt % 1000 == 0) {
-            System.out.print(".");
-        }
         Node s = triple.getSubject();
         Node p = triple.getPredicate();
         Node o = triple.getObject();        
@@ -147,11 +142,10 @@ public class Reader2 implements StreamRDF {
 
     @Override
     public void finish() {
-        /*
         File file = new File("temp.nt");
         if(file.exists()){
             file.delete();
-        }*/
+        }
     }
 
 }

@@ -23,7 +23,7 @@ public class Tester {
     public static void main(String[] args) {
         System.out.println("Run Tester RDFSExtractor");
         Extractor extractor = new Extractor();
-        Schema schema = extractor.run("./test/sample-instance.ttl","./output");
-        schema.write("./output/schema.ttl");    }
+        Schema schema = extractor.run("./test/sample-instance.ttl");
+        schema.write("schema.ttl");    }
 
 }
