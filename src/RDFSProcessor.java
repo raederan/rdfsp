@@ -21,6 +21,7 @@ public class RDFSProcessor {
     public static void main(String[] args) {
         //BasicConfigurator.configure(); //to avoid log4j warning
         System.out.println("rdfs-processor");
+        System.out.println("Java app to extract the RDF Schema from an RDF file.");
         if (args.length == 1) {
             String inputFileName = String.valueOf(args[0]);
             System.out.println("Input file name: " + inputFileName);
@@ -33,7 +34,6 @@ public class RDFSProcessor {
         } else {
             System.out.println("Usage:");
             System.out.println("java -jar rdfs-processor <RDF_filename>");
-            System.out.println("<RDF_filename> : RDF file to transform");
             System.out.println("Output: instance.nt, schema.ttl");
         }
     }    

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -94,11 +95,12 @@ public class Reader1 implements StreamRDF {
             }else if(s.isBlank() && o.isURI()){
                 // (bnode,rdf:type,uri)
                 ResourceClass rc = schema.addResourceClass(o.getURI(), o.getNameSpace(), o.getLocalName());
-                String uri = "http://bnode/" + s.hashCode();
+                String uri = "http://b/n" + s.hashCode();
                 mm_res_rcs.put(uri, rc);
                 if (o.hasURI(RDFS.Datatype.getURI())) {
                     rc.setAsDatatype();
                 }
+                this.writeTriple(s,p,o);
             } else {
                 System.out.println("Warning: Bad formed RDF triple.");
                 System.out.println(this.getNodeLabel1(s) + " " + this.getNodeLabel1(p) + " " + this.getNodeLabel1(o));
@@ -212,7 +214,7 @@ public class Reader1 implements StreamRDF {
             return "<" + node.getURI() + ">";
         }
         if (node.isBlank()) {
-            return "<http://bnode/" + node.hashCode() + ">";
+            return "<http://b/n" + node.hashCode() + ">";
         }
         if (node.isLiteral()) {
             return "\"" + node.getLiteralValue() + "\"^^<" + node.getLiteralDatatypeURI() + ">";
