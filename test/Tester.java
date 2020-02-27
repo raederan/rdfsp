@@ -17,13 +17,14 @@
 
 import Extractor.Extractor;
 import RDFSchema.Schema;
+import Reader.SchemaReader;
 
 public class Tester {
 
     public static void main(String[] args) {
         System.out.println("Run Tester RDFSExtractor");
-        Extractor extractor = new Extractor();
-        Schema schema = extractor.run("./test/sample-instance.ttl");
+        SchemaReader reader = new SchemaReader();
+        Schema schema = reader.run("./test/sp10k-schema.ttl");
         schema.write("schema.ttl");    }
 
 }
