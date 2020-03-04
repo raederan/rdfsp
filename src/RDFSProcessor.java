@@ -23,6 +23,7 @@ public class RDFSProcessor {
         System.out.println("rdfs-processor");
         System.out.println("Java app to extract the RDF Schema from an RDF file.");
         if (args.length == 1) {
+            long itime = System.currentTimeMillis();
             String inputFileName = String.valueOf(args[0]);
             System.out.println("Input file name: " + inputFileName);
             System.out.println("Begin");
@@ -31,6 +32,8 @@ public class RDFSProcessor {
             schema.write("schema.ttl");
             System.out.println("End");
             System.out.println("Output: instance.nt, schema.ttl");
+            long etime = System.currentTimeMillis() - itime;
+            System.out.println("Execution time: " + etime + " ms \n");            
         } else {
             System.out.println("Usage:");
             System.out.println("java -jar rdfs-processor <RDF_filename>");
