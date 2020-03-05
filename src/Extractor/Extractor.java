@@ -52,9 +52,6 @@ public class Extractor {
                 throw new IllegalArgumentException("Error (Extractor): File " + inputFileName + " not found");
             }
             in2.close();
-
-            schema.normalize();
-
         } catch (Exception ex) {
             System.out.println("Error Extractor.run():" + ex.getMessage());
         }

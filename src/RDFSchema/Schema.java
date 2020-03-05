@@ -35,6 +35,34 @@ public class Schema {
 
     }
     
+    public int countResourceClasses(){
+        int cnt = 0;
+        Iterator<ResourceClass> it = classes.iterator();
+        while(it.hasNext()){
+            ResourceClass rc = it.next();
+            if(rc.isClass()){
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+    
+    public int countDatatypes(){
+        int cnt = 0;
+        Iterator<ResourceClass> it = classes.iterator();
+        while(it.hasNext()){
+            ResourceClass rc = it.next();
+            if(rc.isDatatype()){
+                cnt++;
+            }
+        }
+        return cnt;        
+    }
+
+    public int countProperyClasses(){
+        return properties.size();
+    }
+    
     public ResourceClass addResourceClass(String uri, String namespace, String name) {
         ResourceClass rc = new ResourceClass(uri, namespace, name);
         if(classes.contains(rc)){
